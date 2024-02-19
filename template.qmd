@@ -1,6 +1,6 @@
 ---
 title: "Lab 5: Sea-Level Rise"
-author: "<Your Name (NetID)>"
+author: "<Jonathan Gan wg18>"
 jupyter: julia-1.10
 date: 2024-02-16
 
@@ -59,4 +59,72 @@ Plots.default(; margin=5Plots.mm)
 ```{julia}
 using Revise
 using HouseElevation
+```
+
+## House
+```{julia}
+house = let
+    haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame) # read in the file
+    id = 140
+    row = @rsubset(haz_fl_dept, :DmgFnId == id)[1, :] # select the row I want
+    area = 1200u"ft^2"
+    height_above_gauge = 2u"ft"
+    House(
+        row;
+        area=area,
+        height_above_gauge=height_above_gauge,
+        value_usd=400_000,
+    )
+end
+```
+
+## Depth Damage Curve
+```{julia}
+let
+    depths = uconvert.(u"ft", (-7.0u"ft"):(1.0u"inch"):(30.0u"ft"))
+    damages = house.ddf.(depths) ./ 100
+    damages_1000_usd = damages .* house.value_usd ./ 1000
+    scatter(
+        depths,
+        damages_1000_usd;
+        xlabel="Flood Depth",
+        ylabel="Damage (Thousand USD)",
+        label="$(house.description)\n($(house.source))",
+        legend=:bottomright,
+        size=(800, 400),
+        yformatter=:plain, # prevents scientific notation
+    )
+end
+```
+
+## Elevation Cost
+```{julia}
+let
+    elevations = 0u"ft":0.25u"ft":14u"ft"
+    costs = [elevation_cost(house, eᵢ) for eᵢ in elevations]
+    scatter(
+        elevations,
+        costs ./ 1_000;
+        xlabel="Elevation",
+        ylabel="Cost (Thousand USD)",
+        label="$(house.description)\n($(house.source))",
+        legend=:bottomright,
+        size=(800, 400),
+        yformatter=:plain, # prevents scientific notation
+    )
+    
+end
+```
+
+## Sea Level Rise
+```{julia}
+slr_scenarios = let
+    df = CSV.read("data/slr_oddo.csv", DataFrame)
+    [Oddo17SLR(a, b, c, tstar, cstar) for (a, b, c, tstar, cstar) in eachrow(df)]
+end
+println("There are $(length(slr_scenarios)) parameter sets")
+
+
+
+
 ```
