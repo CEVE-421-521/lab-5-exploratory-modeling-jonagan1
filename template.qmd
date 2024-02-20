@@ -77,6 +77,7 @@ house = let
     )
 end
 ```
+I obtained the house value and area from Zillow, where a 1500sqft house in the vicinity of the gauge had a value of approximately $400k. I used a depth damage function from the USACE Galveston data set to ensure that the function would be most appropriate for the locality that my chosen house is located in, and the structure of the house also matches the description of the depth damage function (two stories, no basement).
 
 ## Depth Damage Curve
 ```{julia}
@@ -116,15 +117,69 @@ let
 end
 ```
 
-## Sea Level Rise
+## Sea Level Data
 ```{julia}
 slr_scenarios = let
     df = CSV.read("data/slr_oddo.csv", DataFrame)
     [Oddo17SLR(a, b, c, tstar, cstar) for (a, b, c, tstar, cstar) in eachrow(df)]
 end
 println("There are $(length(slr_scenarios)) parameter sets")
+```
 
+## Storm Surge and Discount Rate
+```{julia}
+function draw_surge_distribution()
+    μ = rand(Normal(5, 1))
+    σ = rand(Exponential(1.5))
+    ξ = rand(Normal(0.1, 0.05))
+    GeneralizedExtremeValue(μ, σ, ξ)
+end
 
+[draw_surge_distribution() for _ in 1:1000]
 
+function draw_discount_rate()
+    return rand(Normal(0.04, 0.02))
+end
+```
+
+## Single simulation
+```{julia}
+p = ModelParams(
+    house=house,
+    years=2024:2083
+)
+
+sow = SOW(
+    rand(slr_scenarios),
+    draw_surge_distribution(),
+    draw_discount_rate()
+)
+
+a = Action(3.0u"ft")
+
+res = run_sim(a, sow, p)
+```
+
+## Large simulations
+```{julia}
+sows = [SOW(rand(slr_scenarios), draw_surge_distribution(), draw_discount_rate()) for _ in 1:10] # for 10 SOWs
+actions = [Action(3.0u"ft") for _ in 1:10] # these are all the same
+results = [run_sim(a, s, p) for (a, s) in zip(actions, sows)]
+
+df = DataFrame(
+    npv=results,
+    Δh_ft=[a.Δh_ft for a in actions],
+    slr_a=[s.slr.a for s in sows],
+    slr_b=[s.slr.b for s in sows],
+    slr_c=[s.slr.c for s in sows],
+    slr_tstar=[s.slr.tstar for s in sows],
+    slr_cstar=[s.slr.cstar for s in sows],
+    surge_μ=[s.surge_dist.μ for s in sows],
+    surge_σ=[s.surge_dist.σ for s in sows],
+    surge_ξ=[s.surge_dist.ξ for s in sows],
+    discount_rate=[s.discount_rate for s in sows],
+)
 
 ```
+
+## Analysis
