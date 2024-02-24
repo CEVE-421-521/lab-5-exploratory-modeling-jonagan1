@@ -146,7 +146,7 @@ end
 ```{julia}
 p = ModelParams(
     house=house,
-    years=2024:2083
+    years=2024:2100
 )
 
 sow = SOW(
@@ -155,15 +155,16 @@ sow = SOW(
     draw_discount_rate()
 )
 
-a = Action(3.0u"ft")
+a = Action(5.0u"ft")
 
 res = run_sim(a, sow, p)
 ```
 
 ## Large simulations
 ```{julia}
-sows = [SOW(rand(slr_scenarios), draw_surge_distribution(), draw_discount_rate()) for _ in 1:10] # for 10 SOWs
-actions = [Action(3.0u"ft") for _ in 1:10] # these are all the same
+sows = [SOW(rand(slr_scenarios), draw_surge_distribution(), draw_discount_rate()) for _ in 1:11] 
+range = 0u"ft":1u"ft":10u"ft"
+actions = [Action(height) for height in range] 
 results = [run_sim(a, s, p) for (a, s) in zip(actions, sows)]
 
 df = DataFrame(
@@ -183,3 +184,9 @@ df = DataFrame(
 ```
 
 ## Analysis
+
+```{julia}
+
+
+
+```
