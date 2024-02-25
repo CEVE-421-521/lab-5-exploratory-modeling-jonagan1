@@ -180,13 +180,16 @@ df = DataFrame(
     surge_ξ=[s.surge_dist.ξ for s in sows],
     discount_rate=[s.discount_rate for s in sows],
 )
-
 ```
+I chose to sample a range of actions from 0ft to 10ft to determine the elevation at which would bring the greatest benefit to the house. 
 
 ## Analysis
 
-```{julia}
+From my analysis, it appears that there is no noticable correlation between the height of elevating my house to gaining benefit. In fact, all the NPVs that I've calculated are negative. However, it seems that elevating the house to 9 feet is the best case scenario with an NPV of -127245, and the worst case scenario is elevating the house to 6 feet. 
 
+The most important parameters other than the height of elevating our houses is the distribution of storm surges. With this model, it is not very sophisticated and we're just using standard distributions to attempt to model a typical storm surge without accounting for the actual weather and storm conditions at our house location.
 
+If I had unlimited computing power, I would try to run more simulations, but not before refining the model to include better distributions of storm surges and discount rates to ensure that the distributions that are used can accurately depict conditions at my chosen house.
 
-```
+These results, particularly in my case of having negative NPVs, suggest that sometimes inaction might make the mose sense on the individual level, since it would not make financial sense to spend money on elevating houses that are already at high risk of being damaged by future storm surges due to their location and geography. Rather, we should explore developing zoning policies and making choices that would have us build in locations that do not have these weather risks, and thus we are able to build cities that would become more resillient to climate change. 
+
