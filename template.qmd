@@ -1,12 +1,11 @@
 ---
 title: "Lab 5: Sea-Level Rise"
-author: "<Jonathan Gan wg18>"
+author: "Jonathan Gan wg18"
 jupyter: julia-1.10
 date: 2024-02-16
 
 format: 
     html: default
-
     # YOU DO NOT NEED BOTH PDF AND DOCX.
     # COMMENT OR DELETE THE ONE YOU DON'T WANT TO USE.
     pdf:
@@ -16,11 +15,11 @@ format:
             - margin=1in  
         number-sections: true
         code-line-numbers: true
-    #docx: 
-    #    toc: true
-    #    fig-format: png
-    #    number-sections: true
-    #    code-line-numbers: true
+    # docx: 
+    #     toc: true
+    #     fig-format: png
+    #     number-sections: true
+    #     code-line-numbers: true
 
 date-format: "ddd., MMM. D"
 bibliography: references.bib
@@ -74,7 +73,7 @@ house = let
         area=area,
         height_above_gauge=height_above_gauge,
         value_usd=400_000,
-    )
+    );
 end
 ```
 I obtained the house value and area from Zillow, where a 1500sqft house in the vicinity of the gauge had a value of approximately $400k. I used a depth damage function from the USACE Galveston data set to ensure that the function would be most appropriate for the locality that my chosen house is located in, and the structure of the house also matches the description of the depth damage function (two stories, no basement).
@@ -184,8 +183,7 @@ df = DataFrame(
 I chose to sample a range of actions from 0ft to 10ft to determine the elevation at which would bring the greatest benefit to the house. 
 
 ## Analysis
-
-From my analysis, it appears that there is no noticable correlation between the height of elevating my house to gaining benefit. In fact, all the NPVs that I've calculated are negative. However, it seems that elevating the house to 9 feet is the best case scenario with an NPV of -127245, and the worst case scenario is elevating the house to 6 feet. 
+From my analysis, it appears that there is no noticable correlation between the height of elevating my house to gaining benefit. In fact, all the NPVs that I've calculated are negative. However, through my iterations it appears that elevating the house higher would result in a less negative NPV. 
 
 The most important parameters other than the height of elevating our houses is the distribution of storm surges. With this model, it is not very sophisticated and we're just using standard distributions to attempt to model a typical storm surge without accounting for the actual weather and storm conditions at our house location.
 
